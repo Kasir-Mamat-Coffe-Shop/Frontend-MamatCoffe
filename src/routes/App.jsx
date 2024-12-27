@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import "./App.css";
+import "../assets/style/App.css";
 import Transaction from "../pages/products/Transaction";
 import ManageProduct from "../pages/products/Manage";
 import HistoryTransaction from "../pages/data/HistoryTransaction";
@@ -7,7 +7,6 @@ import Archive from "../pages/data/RekapArchive";
 import DisplayUser from "../pages/user/ProductTransaction";
 import Login from "../pages/auth/Login";
 import NotFound from "../components/NotFound";
-import HistoryTransaction from "../pages/data/HistoryTransaction";
 
 function App() {
   return (
