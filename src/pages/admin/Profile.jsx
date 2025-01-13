@@ -1,5 +1,5 @@
 import React from "react";
-import profile from "../../assets/images/profile.png"
+import profile from "../../assets/images/profile.png";
 import LeftBar from "../../components/LeftBar";
 const Profile = () => {
   return (
@@ -14,25 +14,15 @@ const Profile = () => {
           <hr className="h-px bg-gray-300 border-0 dark:bg-gray-700"></hr>
           <div className="flex overflow-y-auto gap-1 my-7 py-14 px-10 justify-between bg-white border border-gray-200 rounded-sm shadow-sm h-[85%]">
             <div className="w-2/3 flex flex-col pl-8 gap-4 font-semibold text-gray-500">
-              <div className="flex gap-10">
-                <div className="text-left flex flex-col w-1/2 gap-2">
-                  <label>First Name</label>
-                  <input
-                    type="text"
-                    placeholder="First Name"
-                    className="rounded-[4px] border-gray-400 "
-                  />
-                </div>
-                <div className="text-left flex flex-col w-1/2 gap-2">
-                  <label>Last Name</label>
-                  <input
-                    type="text"
-                    placeholder="Last Name"
-                    className="rounded-[4px] border-gray-400 "
-                  />
-                </div>
-              </div>
               <div className="flex flex-col gap-4">
+                <div className="text-left flex flex-col gap-3">
+                  <label>Nama Lengkap</label>
+                  <input
+                    type="text"
+                    placeholder="nama"
+                    className="rounded-[4px] border-gray-400 "
+                  />
+                </div>
                 <div className="text-left flex flex-col gap-3">
                   <label>Brith Day</label>
                   <input

@@ -39,13 +39,13 @@ const LeftBar = () => {
     <div>
       <div className="top-0 left-0 h-screen w-[17vh] justify-center">
         <div className="h-full px-3 py-4 flex flex-col items-center justify-between bg-white dark:bg-gray-800 text-left">
-          <ul className="flex flex-col gap-14 py-10 font-semibold text-sm text-center">
+          <ul className="flex flex-col gap-11 py-10 font-semibold text-sm text-center">
             <li>
               <Link
                 className="flex flex-col items-center text-gray-600"
                 to="/admin/profile"
               >
-                <span className="fas fa-user-circle text-xl"></span>
+                <span className="fas fa-user-circle text-md"></span>
                 <span>Profile</span>
               </Link>
             </li>
@@ -75,9 +75,18 @@ const LeftBar = () => {
             <li>
               <Link
                 className="flex flex-col items-center text-gray-600"
+                to="/admin/kategori-product"
+              >
+                <span className="fas fa-th-large text-md"></span>
+                <span>Kategori</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                className="flex flex-col items-center text-gray-600"
                 to="/admin/history-transaction"
               >
-                <span className="fas fa-history text-xl"></span>
+                <span className="fas fa-history text-md"></span>
                 <span>History</span>
               </Link>
             </li>
@@ -86,7 +95,7 @@ const LeftBar = () => {
                 className="flex flex-col items-center text-gray-600"
                 to="/admin/account"
               >
-                <span className="fas fa-user-cog text-xl"></span>
+                <span className="fas fa-user-cog text-md"></span>
                 <span>Account</span>
               </Link>
             </li>
@@ -94,7 +103,7 @@ const LeftBar = () => {
           <div className="flex flex-col items-center my-7">
             <button
               onClick={openModalLogout}
-              className="flex font-semibold bg-transparent outline-none border-0 text-gray-900 gap-2 focus:outline-none active:outline-none"
+              className="flex flex-col items-center semibold bg-transparent outline-none border-0 text-gray-900 gap-2 focus:outline-none active:outline-none"
             >
               <span className="fas fa-sign-out-alt text-xl"></span>
               <span className="font-semibold">Log Out</span>
