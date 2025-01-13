@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import LeftBar from "../../components/LeftBar";
 import SearchBar from "../../components/SearchBar";
 import Modal from "../../components/Modal";
-
+import { useNavigate } from "react-router-dom";
 const Account = () => {
   const [error, setError] = useState("");
-
+  const [users, setUsers] = useState(null);
   const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
   const openModalCreate = () => setIsModalCreateOpen(true);
   const closeModalCreate = () => setIsModalCreateOpen(false);
@@ -16,7 +16,8 @@ const Account = () => {
   const openModalDelete = () => setIsModalDeleteOpen(true);
   const closeModalDelete = () => setIsModalDeleteOpen(false);
 
-  const [createName, setCreateName] = useState("");
+  const [createNameDepan, setCreateNameDepan] = useState("");
+  const [createNameBelakang, setCreateNameBelakang] = useState("");
   const [createBrithDay, setCreateBrithDay] = useState("");
   const [createAddress, setCreateAddress] = useState("");
   const [createUsername, setCreateUsername] = useState("");
@@ -32,24 +33,52 @@ const Account = () => {
   const [updatePassword, setUpdatePassword] = useState("");
   const [updateImage, setUpdateImage] = useState(null);
 
+  const navigate = useNavigate();
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      navigate("/"); 
+    }
+  }, [navigate]);
+
+  // useEffect(() => {
+  //   const token = sessionStorage.getItem("token");
+  //   const getUsers = async () => {
+  //     try {
+  //       const response = await fetch("http://localhost:3000/api/categorys", {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: token,
+  //         },
+  //       });
+  //       const result = await response.json();
+  //       setUsers(result);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+
+  //   getCategory();
+  // }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const formData = new FormData();
-    formData.append("nama", createName);
-    formData.append("brithDay", createBrithDay);
-    formData.append("address", createAddress);
-    formData.append("username", createUsername);
-    formData.append("email", createEmail);
-    formData.append("password", createPassword);
-    formData.append("image", createImage);
+    const token = sessionStorage.getItem("token");
     try {
       const createAccount = await fetch("http://localhost:3000/api/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": token,
         },
-        body: formData,
+        body: {
+          email: createEmail,
+          password: createPassword,
+          first_name: createNameDepan,
+          last_name: createNameBelakang,
+          address: createAddress,
+          birth_date: createBrithDay,
+        },
       });
       if (createAccount.ok) {
         setError("");
@@ -75,102 +104,130 @@ const Account = () => {
             <button
               onClick={openModalCreate}
               type="button"
-              class="text-xs text-center text-white mb-2 bg-blue-700 rounded-sm hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              className="text-xs text-center text-white mb-2 bg-blue-700 rounded-sm hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               <span className="fas fa-plus"></span> Tambah
             </button>
-            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-              <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
-                  <th scope="col" class="px-6 py-3">
+                  <th scope="col" className="px-6 py-3">
                     Employer Name
                   </th>
-                  <th scope="col" class="px-6 py-3">
+                  <th scope="col" className="px-6 py-3">
                     Address
                   </th>
-                  <th scope="col" class="px-6 py-3">
+                  <th scope="col" className="px-6 py-3">
                     Email
                   </th>
-                  <th scope="col" class="px-6 py-3">
+                  <th scope="col" className="px-6 py-3">
                     Password
                   </th>
-                  <th scope="col" class="px-6 py-3">
+                  <th scope="col" className="px-6 py-3">
                     image
                   </th>
-                  <th scope="col" class="px-6 py-3">
+                  <th scope="col" className="px-6 py-3">
                     Role
                   </th>
-                  <th scope="col" class="px-6 py-3">
+                  <th scope="col" className="px-6 py-3">
                     Action
                   </th>
                 </tr>
               </thead>
               <tbody>
-                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                  <th
-                    scope="row"
-                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                  >
-                    Mamat
-                  </th>
-                  <td class="px-6 py-4">Bogor</td>
-                  <td class="px-6 py-4">Iksanwijaya018@gmail.com</td>
-                  <td class="px-6 py-4">Password</td>
-                  <td class="px-6 py-4">Password</td>
-                  <td class="px-6 py-4">Password</td>
-                  <td class="px-6 py-4 space-x-3">
-                    <a
-                      onClick={openModalEdit}
-                      href="#"
-                      className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                    >
-                      Edit
-                    </a>
-                    <a
-                      onClick={openModalDelete}
-                      href="#"
-                      className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                    >
-                      Delete
-                    </a>
-                  </td>
-                </tr>
+                {users ? (
+                  users.data.map((item, index) => (
+                    <tr key={index}>
+                      <th
+                        scope="row"
+                        className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                      >
+                        {item.name}
+                      </th>
+                      <td className="px-6 py-4">{item.city}</td>
+                      <td className="px-6 py-4">{item.email}</td>
+                      <td className="px-6 py-4">{item.password}</td>
+                      <td className="px-6 py-4">{item.role}</td>
+                      <td className="px-6 py-4">{item.status}</td>
+                      <td className="px-6 py-4 space-x-3">
+                        <a
+                          onClick={() => openModalEdit(item.id)}
+                          href="#"
+                          className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                        >
+                          Edit
+                        </a>
+                        <a
+                          onClick={() => openModalDelete(item.id)}
+                          href="#"
+                          className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                        >
+                          Delete
+                        </a>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      Tidak ada data yang tersedia
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
         </div>
         <Modal isOpen={isModalCreateOpen} onClose={closeModalCreate}>
-          <div class="flex justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+          <div className="flex justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
               Create Account Employer
             </h3>
           </div>
-          <div class="p-4 md:p-5 text-left">
-            <form class="space-y-2" action="#" onSubmit={handleSubmit}>
+          <div className="p-4 md:p-5 text-left">
+            <form className="space-y-2" action="#" onSubmit={handleSubmit}>
               <div className="flex gap-5">
                 <div className="space-y-4">
                   <div>
                     <label
-                      for="nama"
-                      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      htmlFor="nama_depan"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
-                      Nama
+                      Nama Depan
                     </label>
                     <input
-                      type="nama"
-                      name="nama"
-                      id="nama"
-                      value={createName}
-                      onChange={(e) => setCreateName(e.target.value)}
-                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                      type="text"
+                      name="nama_depan"
+                      id="nama_depan"
+                      value={createNameDepan}
+                      onChange={(e) => setCreateNameDepan(e.target.value)}
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                      placeholder="Nama Depan"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="nama"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Nama Belakang
+                    </label>
+                    <input
+                      type="text"
+                      name="nama_beakang"
+                      id="nama_belakang"
+                      value={createNameBelakang}
+                      onChange={(e) => setCreateNameBelakang(e.target.value)}
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                       placeholder="Mamat Maulana"
                       required
                     />
                   </div>
                   <div>
                     <label
-                      for="ulang-tahun"
-                      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      htmlFor="ulang-tahun"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
                       Brith Day
                     </label>
@@ -180,14 +237,16 @@ const Account = () => {
                       id="ulang-tahun"
                       value={createBrithDay}
                       onChange={(e) => setCreateBrithDay(e.target.value)}
-                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                       required
                     />
                   </div>
+                </div>
+                <div className="space-y-4">
                   <div>
                     <label
-                      for="address"
-                      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      htmlFor="address"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
                       Address
                     </label>
@@ -197,35 +256,15 @@ const Account = () => {
                       id="address"
                       value={createAddress}
                       onChange={(e) => setCreateAddress(e.target.value)}
-                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                       placeholder="Jl. Pahlawan"
                       required
                     />
                   </div>
-                </div>
-                <div className="space-y-4">
                   <div>
                     <label
-                      for="username"
-                      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                    >
-                      Username
-                    </label>
-                    <input
-                      type="text"
-                      name="username"
-                      id="username"
-                      value={createUsername}
-                      onChange={(e) => setCreateUsername(e.target.value)}
-                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                      placeholder="Mamat"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label
-                      for="email"
-                      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      htmlFor="email"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
                       Email
                     </label>
@@ -236,14 +275,14 @@ const Account = () => {
                       value={createEmail}
                       onChange={(e) => setCreateEmail(e.target.value)}
                       placeholder="user@gmail.com"
-                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                       required
                     />
                   </div>
                   <div>
                     <label
-                      for="password"
-                      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      htmlFor="password"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
                       Password
                     </label>
@@ -254,32 +293,17 @@ const Account = () => {
                       placeholder="*******"
                       value={createPassword}
                       onChange={(e) => setCreatePassword(e.target.value)}
-                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                       required
                     />
                   </div>
                 </div>
               </div>
               <div className="text-left space-y-5">
-                <div>
-                  <label
-                    for="gambar"
-                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Image
-                  </label>
-                  <input
-                    type="file"
-                    name="gambar"
-                    id="gambar"
-                    accept="image/png, image/jpeg"
-                    onChange={(e) => setCreateImage(e.target.files[0])}
-                    required
-                  />
-                </div>
+                {" "}
                 <button
                   type="submit"
-                  class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                  className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >
                   Create Account
                 </button>
@@ -288,19 +312,19 @@ const Account = () => {
           </div>
         </Modal>
         <Modal isOpen={isModalEditOpen} onClose={closeModalEdit}>
-          <div class="flex justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+          <div className="flex justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
               Update Account Employer
             </h3>
           </div>
-          <div class="p-4 md:p-5 text-left">
-            <form class="space-y-2" action="#" onSubmit={handleSubmit}>
+          <div className="p-4 md:p-5 text-left">
+            <form className="space-y-2" action="#" onSubmit={handleSubmit}>
               <div className="flex gap-5">
                 <div className="space-y-4">
                   <div>
                     <label
-                      for="nama"
-                      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      htmlFor="nama"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
                       Nama
                     </label>
@@ -310,15 +334,15 @@ const Account = () => {
                       id="nama"
                       value={updateName}
                       onChange={(e) => setUpdateName(e.target.value)}
-                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                       placeholder="Mamat Maulana"
                       required
                     />
                   </div>
                   <div>
                     <label
-                      for="ulang-tahun"
-                      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      htmlFor="ulang-tahun"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
                       Brith Day
                     </label>
@@ -328,14 +352,14 @@ const Account = () => {
                       id="ulang-tahun"
                       value={updateBrithDay}
                       onChange={(e) => setUpdateBrithDay(e.target.value)}
-                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                       required
                     />
                   </div>
                   <div>
                     <label
-                      for="address"
-                      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      htmlFor="address"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
                       Address
                     </label>
@@ -345,7 +369,7 @@ const Account = () => {
                       id="address"
                       value={updateAddress}
                       onChange={(e) => setUpdateAddress(e.target.value)}
-                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                       placeholder="Jl. Pahlawan"
                       required
                     />
@@ -354,8 +378,8 @@ const Account = () => {
                 <div className="space-y-4">
                   <div>
                     <label
-                      for="username"
-                      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      htmlFor="username"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
                       Username
                     </label>
@@ -365,15 +389,15 @@ const Account = () => {
                       id="username"
                       value={updateUsername}
                       onChange={(e) => setUpdateUsername(e.target.value)}
-                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                       placeholder="Mamat"
                       required
                     />
                   </div>
                   <div>
                     <label
-                      for="email"
-                      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      htmlFor="email"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
                       Email
                     </label>
@@ -384,14 +408,14 @@ const Account = () => {
                       value={updateEmail}
                       onChange={(e) => setUpdateEmail(e.target.value)}
                       placeholder="user@gmail.com"
-                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                       required
                     />
                   </div>
                   <div>
                     <label
-                      for="password"
-                      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      htmlFor="password"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
                       Password
                     </label>
@@ -402,7 +426,7 @@ const Account = () => {
                       placeholder="*******"
                       value={updatePassword}
                       onChange={(e) => setUpdatePassword(e.target.value)}
-                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                       required
                     />
                   </div>
@@ -411,8 +435,8 @@ const Account = () => {
               <div className="text-left space-y-5">
                 <div>
                   <label
-                    for="gambar"
-                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    htmlFor="gambar"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Image
                   </label>
@@ -427,7 +451,7 @@ const Account = () => {
                 </div>
                 <button
                   type="submit"
-                  class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                  className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >
                   Update Account
                 </button>
@@ -436,14 +460,14 @@ const Account = () => {
           </div>
         </Modal>
         <Modal isOpen={isModalDeleteOpen} onClose={closeModalDelete}>
-          <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+          <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
             <button
               type="button"
-              class="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+              className="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
               data-modal-hide="popup-modal"
             >
               <svg
-                class="w-3 h-3"
+                className="w-3 h-3"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -457,11 +481,11 @@ const Account = () => {
                   d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
                 />
               </svg>
-              <span class="sr-only">Close modal</span>
+              <span className="sr-only">Close modal</span>
             </button>
-            <div class="p-4 md:p-5 text-center">
+            <div className="p-4 md:p-5 text-center">
               <svg
-                class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200"
+                className="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -475,13 +499,13 @@ const Account = () => {
                   d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
                 />
               </svg>
-              <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+              <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
                 Are you sure you want to delete this Account?
               </h3>
               <button
                 data-modal-hide="popup-modal"
                 type="button"
-                class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center"
+                className="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center"
               >
                 Yes, I'm sure
               </button>
@@ -489,7 +513,7 @@ const Account = () => {
                 data-modal-hide="popup-modal"
                 onClick={closeModalDelete}
                 type="button"
-                class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                className="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
               >
                 No, cancel
               </button>

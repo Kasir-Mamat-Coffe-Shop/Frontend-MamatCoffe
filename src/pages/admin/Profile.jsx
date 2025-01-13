@@ -1,7 +1,46 @@
-import React from "react";
+import React, { useState } from "react";
 import profile from "../../assets/images/profile.png";
 import LeftBar from "../../components/LeftBar";
-const Profile = () => {
+import { useNavigate } from "react-router-dom";
+const Profile = async () => {
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      navigate("/"); // Redirect to login if no token
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    const fetchProfile = async () => {
+      try {
+        const getProfile = await fetch(
+          "http://localhost:3000/api/users/current",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": token,
+            },
+          }
+        );
+
+        if (getProfile.ok) {
+          const responseData = await getProfile.json();
+          setError(""); 
+        } else {
+          const responseData = await getProfile.json();
+          setError(responseData.message || "Get Profile gagal. Coba lagi.");
+        }
+      } catch (err) {
+        setError("Terjadi kesalahan. Silakan coba lagi.");
+      }
+    };
+
+    fetchProfile();
+  }, []);
   return (
     <div>
       <div className="flex w-full">
@@ -9,7 +48,7 @@ const Profile = () => {
         <div className="flex-grow mx-6 md:min-w-[500px] xl:w-full">
           <div className="flex justify-between my-4">
             <h2 className="text-2xl font-bold">Profile Pegawai</h2>
-            <h2 className="text-xl font-normal">Mamat Saepuloh</h2>
+            <h2 className="text-xl font-normal"></h2>
           </div>
           <hr className="h-px bg-gray-300 border-0 dark:bg-gray-700"></hr>
           <div className="flex overflow-y-auto gap-1 my-7 py-14 px-10 justify-between bg-white border border-gray-200 rounded-sm shadow-sm h-[85%]">
