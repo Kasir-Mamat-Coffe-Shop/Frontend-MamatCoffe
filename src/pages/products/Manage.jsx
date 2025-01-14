@@ -31,6 +31,9 @@ const Manage = () => {
   const [updateImage, setUpdateImage] = useState("");
 
   const [error, setError] = useState("");
+  const [listCategory, setListCategory] = useState(null);
+  const [idProduct, setIdProduct] = useState("");
+  const [listProduct, setListProduct] = useState(null);
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
@@ -41,18 +44,23 @@ const Manage = () => {
 
   const handleSubmitCreate = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("product_name", createProductName);
-    formData.append("category", createCategory);
-    formData.append("price", createPrice);
-    formData.append("stock", createStock);
-    formData.append("image", createImage);
-
+    const token = sessionStorage.getItem("token");
     try {
       const createProduct = await fetch("http://localhost:3000/api/products", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": token,
+        },
+        body: JSON.stringify({
+          product_name: createProductName,
+          price: parseFloat(createPrice),
+          stock: parseInt(createStock, 10),
+          image: "https://example.com/matcha.jpg",
+          category_id: parseInt(createCategory, 10),
+        }),
       });
+
       if (createProduct.ok) {
         setError("");
         closeModalCreate();
@@ -65,22 +73,65 @@ const Manage = () => {
     }
   };
 
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    const getCategory = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/categorys/", {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+        });
+        const result = await response.json();
+        setListCategory(result);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getCategory();
+  }, []);
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    const getProduct = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/products/", {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+        });
+        const result = await response.json();
+        setListProduct(result);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getProduct();
+    console.log("Sini:", listProduct);
+  }, []);
+
   const handleSubmitUpdate = async (e) => {
     e.preventDefault();
-    // Prepare the data to update product
-    const formData = new FormData();
-    formData.append("product_name", updateProductName);
-    formData.append("category", updateCategory);
-    formData.append("price", updatePrice);
-    formData.append("stock", updateStock);
-    formData.append("image", updateImage);
-
+    const token = sessionStorage.getItem("token");
     try {
       const updateProduct = await fetch(
-        `http://localhost:3000/api/products/${updateProductName}`,
+        `http://localhost:3000/api/products/${idProduct}`,
         {
           method: "PUT",
-          body: formData,
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": token,
+          },
+          body: JSON.stringify({
+            product_name: updateProductName,
+            price: parseFloat(updatePrice),
+            stock: parseInt(updateStock, 10),
+            image: "https://example.com/matcha.jpg",
+            category_id: parseInt(updateCategory, 10),
+          }),
         }
       );
       if (updateProduct.ok) {
@@ -114,7 +165,15 @@ const Manage = () => {
       setError("Terjadi kesalahan. Silakan coba lagi.");
     }
   };
-
+  useEffect(() => {
+    console.log("Request Body:", {
+      product_name: createProductName,
+      price: parseFloat(createPrice),
+      stock: parseInt(createStock, 10),
+      image: "../../assets/images/coffe.png",
+      category_id: parseInt(createCategory, 10),
+    });
+  }, [handleSubmitCreate]);
   return (
     <div>
       <div className="flex w-full">
@@ -137,10 +196,10 @@ const Manage = () => {
               <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                   <th scope="col" className="px-6 py-3">
-                    Product name
+                    Image
                   </th>
                   <th scope="col" className="px-6 py-3">
-                    Color
+                    Product name
                   </th>
                   <th scope="col" className="px-6 py-3">
                     Category
@@ -149,39 +208,61 @@ const Manage = () => {
                     Price
                   </th>
                   <th scope="col" className="px-6 py-3">
+                    Stock
+                  </th>
+                  <th scope="col" className="px-6 py-3">
                     Action
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {/* Add dynamic rows here from your product data */}
-                <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                  <th
-                    scope="row"
-                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                  >
-                    Apple Watch
-                  </th>
-                  <td className="px-6 py-4">Black</td>
-                  <td className="px-6 py-4">Watches</td>
-                  <td className="px-6 py-4">$199</td>
-                  <td className="px-6 py-4 flex gap-2">
-                    <a
-                      onClick={openModalEdit}
-                      href="#"
-                      className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                {listProduct ? (
+                  listProduct.data.map((item, index) => (
+                    <tr
+                      key={index}
+                      className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                     >
-                      Edit
-                    </a>
-                    <a
-                      onClick={openModalDelete}
-                      href="#"
-                      className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                    >
-                      Delete
-                    </a>
-                  </td>
-                </tr>
+                      <th
+                        scope="row"
+                        className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                      >
+                        {item.image}
+                      </th>
+                      <td className="px-6 py-4">{item.product_name}</td>
+                      <td className="px-6 py-4">{item.category_id}</td>
+                      <td className="px-6 py-4">{item.price}</td>
+                      <td className="px-6 py-4">{item.stock}</td>
+                      <td className="px-6 py-4 flex gap-2">
+                        <a
+                          onClick={() => {
+                            openModalEdit();
+                            setIdProduct(item.id);
+                          }}
+                          href="#"
+                          className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                        >
+                          Edit
+                        </a>
+                        <a
+                          onClick={() => {
+                            openModalDelete();
+                            setIdProduct(item.id);
+                          }}
+                          href="#"
+                          className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                        >
+                          Delete
+                        </a>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="text-center py-4">
+                      Tidak ada data yang tersedia
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -230,7 +311,16 @@ const Manage = () => {
                       value={createCategory}
                       onChange={(e) => setCreateCategory(e.target.value)}
                     >
-                      <option value="1">Category</option>
+                      <option value="">Pilih Category</option>
+                      {listCategory ? (
+                        listCategory.data.map((item, index) => (
+                          <option key={index} value={item.id}>
+                            {item.category_name}
+                          </option>
+                        ))
+                      ) : (
+                        <option value="">No Categories Available</option>
+                      )}
                     </select>
                   </div>
                 </div>
@@ -343,7 +433,15 @@ const Manage = () => {
                       value={updateCategory}
                       onChange={(e) => setUpdateCategory(e.target.value)}
                     >
-                      <option value="1">Category</option>
+                      {listCategory ? (
+                        listCategory.data.map((item, index) => (
+                          <option key={index} value={item.id}>
+                            {item.category_name}
+                          </option>
+                        ))
+                      ) : (
+                        <option value="">No Categories Available</option>
+                      )}
                     </select>
                   </div>
                 </div>
@@ -431,7 +529,7 @@ const Manage = () => {
                 Cancel
               </button>
               <button
-                onClick={() => handleDelete()}
+                onClick={() => handleDelete(idProduct)}
                 className="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-700"
               >
                 Delete
