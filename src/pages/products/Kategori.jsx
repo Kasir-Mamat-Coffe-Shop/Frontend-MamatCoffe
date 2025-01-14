@@ -27,29 +27,6 @@ const Kategori = () => {
     }
   }, [navigate]);
 
-  useEffect(() => {
-    const token = sessionStorage.getItem("token");
-    const getCategory = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/api/categorys/", {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token,
-          },
-        });
-        const result = await response.json();
-        if (result.data) {
-          setListCategory(result.data); // Set the categories if the data is valid
-        }
-      } catch (error) {
-        console.log(error);
-        setError("Failed to fetch categories");
-      }
-    };
-
-    getCategory();
-  }, []); // Empty dependency array ensures it runs only once
-
   const updateCategory = async (id) => {
     const token = sessionStorage.getItem("token");
     try {
@@ -132,8 +109,8 @@ const Kategori = () => {
 
       if (updateCategory.ok) {
         closeModalEdit();
-        setCategory(""); 
-        setError(""); 
+        setCategory("");
+        setError("");
         const response = await updateCategory.json();
         setListCategory((prevState) => {
           return prevState.map((item) =>
@@ -178,6 +155,28 @@ const Kategori = () => {
       setError("An error occurred while deleting the category.");
     }
   };
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    const getCategory = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/categorys/", {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+        });
+        const result = await response.json();
+        if (result.data) {
+          setListCategory(result.data); // Set the categories if the data is valid
+        }
+      } catch (error) {
+        console.log(error);
+        setError("Failed to fetch categories");
+      }
+    };
+
+    getCategory();
+  }, [handleSubmit, handleSubmitEdit, handleDelete]); // Empty dependency array ensures it runs only once
 
   return (
     <div>

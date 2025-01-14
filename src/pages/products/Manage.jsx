@@ -73,46 +73,6 @@ const Manage = () => {
     }
   };
 
-  useEffect(() => {
-    const token = sessionStorage.getItem("token");
-    const getCategory = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/api/categorys/", {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token,
-          },
-        });
-        const result = await response.json();
-        setListCategory(result);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    getCategory();
-  }, []);
-
-  useEffect(() => {
-    const token = sessionStorage.getItem("token");
-    const getProduct = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/api/products/", {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token,
-          },
-        });
-        const result = await response.json();
-        setListProduct(result);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getProduct();
-    console.log("Sini:", listProduct);
-  }, []);
-
   const handleSubmitUpdate = async (e) => {
     e.preventDefault();
     const token = sessionStorage.getItem("token");
@@ -147,11 +107,16 @@ const Manage = () => {
   };
 
   const handleDelete = async (productId) => {
+    const token = sessionStorage.getItem("token");
     try {
       const deleteProduct = await fetch(
         `http://localhost:3000/api/products/${productId}`,
         {
           method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
         }
       );
       if (deleteProduct.ok) {
@@ -166,14 +131,44 @@ const Manage = () => {
     }
   };
   useEffect(() => {
-    console.log("Request Body:", {
-      product_name: createProductName,
-      price: parseFloat(createPrice),
-      stock: parseInt(createStock, 10),
-      image: "../../assets/images/coffe.png",
-      category_id: parseInt(createCategory, 10),
-    });
-  }, [handleSubmitCreate]);
+    const token = sessionStorage.getItem("token");
+    const getCategory = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/categorys/", {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+        });
+        const result = await response.json();
+        setListCategory(result);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getCategory();
+  }, [handleSubmitUpdate, handleDelete, handleSubmitCreate]);
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    const getProduct = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/products/", {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+        });
+        const result = await response.json();
+        setListProduct(result);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getProduct();
+    console.log("Sini:", listProduct);
+  }, [handleSubmitUpdate, handleDelete, handleSubmitCreate]);
   return (
     <div>
       <div className="flex w-full">
@@ -249,7 +244,7 @@ const Manage = () => {
                             setIdProduct(item.id);
                           }}
                           href="#"
-                          className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                          className="font-medium text-red-600 dark:text-red-500 hover:underline"
                         >
                           Delete
                         </a>
