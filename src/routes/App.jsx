@@ -10,7 +10,7 @@ import Profile from "../pages/admin/Profile";
 import Account from "../pages/admin/account";
 import Login from "../pages/auth/Login";
 import NotFound from "../components/NotFound";
-
+import Kategori from "../pages/products/Kategori";
 function App() {
   const [isScreenSmall, setIsScreenSmall] = useState(false);
 
@@ -44,6 +44,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/admin/transaction" element={<Transaction />} />
         <Route path="/admin/manage-product" element={<ManageProduct />} />
+        <Route path="/admin/kategori-product" element={<Kategori />} />
         <Route
           path="/admin/history-transaction"
           element={<HistoryTransaction />}

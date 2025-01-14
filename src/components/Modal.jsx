@@ -9,7 +9,7 @@ const Modal = (props) => {
     <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-[9999]">
       <div className="relative bg-white rounded-md shadow-lg overflow-hidden">
         <button
-          className="absolute top-2 right-2 text-gray-500 bg-transparent border-0 hover:text-black active:text-black focus:text-black focus:outline-none active:outline-none"
+          className="absolute top-3 right-1 text-gray-500 bg-transparent border-0 hover:text-black active:text-black focus:text-black focus:outline-none active:outline-none"
           onClick={onClose}
         >
           <svg
