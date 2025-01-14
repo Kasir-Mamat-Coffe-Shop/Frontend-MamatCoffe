@@ -5,7 +5,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  
+
   const [currentDateTime, setCurrentDateTime] = useState({
     date: "",
     time: "",
@@ -30,6 +30,7 @@ const Login = () => {
         if (login.ok) {
           const responseData = await login.json(); // Assuming token is returned
           sessionStorage.setItem("token", responseData.data.token);
+          sessionStorage.setItem("email", responseData.data.email);
           setError("");
           navigate("/admin/transaction");
         } else {
