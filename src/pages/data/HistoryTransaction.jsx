@@ -1,8 +1,84 @@
 import React, { useState, useEffect } from "react";
 import LeftBar from "../../components/LeftBar";
 import SearchBar from "../../components/SearchBar";
+import { useNavigate } from "react-router-dom";
 
 const HistoryTransaction = () => {
+  const [transactions, setTransactions] = useState([]);
+  const [detail, setDetail] = useState([]);
+  const navigate = useNavigate();
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      navigate("/");
+    }
+  }, [navigate]);
+
+  const fetchTransactions = async () => {
+    const token = sessionStorage.getItem("token");
+    try {
+      const response = await fetch("http://localhost:3000/api/transactions/", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": token,
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+
+      // Log data for debugging
+      console.log("Fetched transactions data:", data);
+
+      return data; // Return the fetched data
+    } catch (error) {
+      console.error("Failed to fetch transactions:", error);
+      return null; // Return null if an error occurs
+    }
+  };
+  const fetchDetail = async () => {
+    const token = sessionStorage.getItem("token");
+    try {
+      const response = await fetch(
+        "http://localhost:3000/api/transactions/list/details",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": token,
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+
+      // Log data for debugging
+      console.log("Fetched transactions data:", data);
+
+      return data; // Return the fetched data
+    } catch (error) {
+      console.error("Failed to fetch transactions:", error);
+      return null; // Return null if an error occurs
+    }
+  };
+
+  useEffect(() => {
+    const loadTransactions = async () => {
+      const data = await fetchTransactions();
+      const detail = await fetchDetail();
+      if (data) {
+        setTransactions(data.data);
+        setDetail(detail);
+      }
+    };
+
+    loadTransactions();
+  }, []);
+  console.log(detail);
   return (
     <div>
       <div className="flex w-full">
@@ -18,7 +94,10 @@ const HistoryTransaction = () => {
               <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                   <th scope="col" class="px-6 py-3">
-                    Kasir name
+                    Email Kasir
+                  </th>
+                  <th scope="col" class="px-6 py-3">
+                    Methode
                   </th>
                   <th scope="col" class="px-6 py-3">
                     Code Transaction
@@ -27,10 +106,13 @@ const HistoryTransaction = () => {
                     Date
                   </th>
                   <th scope="col" class="px-6 py-3">
+                    status
+                  </th>
+                  <th scope="col" class="px-6 py-3">
                     Product
                   </th>
                   <th scope="col" class="px-6 py-3">
-                    Count
+                    Quantity
                   </th>
                   <th scope="col" class="px-6 py-3">
                     Subtotal
@@ -41,97 +123,47 @@ const HistoryTransaction = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                  <th
-                    scope="row"
-                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                  >
-                    Mamat
-                  </th>
-                  <td class="px-6 py-4">Tr123456</td>
-                  <td class="px-6 py-4">01-01-2025</td>
-                  <td class="px-6 py-4">Sabun</td>
-                  <td class="px-6 py-4">3</td>
-                  <td class="px-6 py-4">30.000</td>
-                  <td class="px-6 py-4">30.000</td>
-                </tr>
+                {transactions ? (
+                  transactions.map((trans, index) => (
+                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                      <td class="px-6 py-4">{trans.email}</td>
+                      <td class="px-6 py-4">{trans.transaction_method}</td>
+                      <td class="px-6 py-4">{trans.transaction_code}</td>
+                      <td class="px-6 py-4">{trans.date}</td>
+                      <td class="px-6 py-4">{trans.status}</td>
+                      <td class="px-6 py-4">
+                        {detail
+                          .filter((item) => item.transaction_id === trans.id) // Cocokkan berdasarkan transaction_id
+                          .map((item, index) => item.product.product_name) // Ambil nama produk
+                          .join(", ")}{" "}
+                        {/* Gabungkan hasil jika lebih dari satu */}
+                      </td>
+                      <td class="px-6 py-4">
+                        {detail
+                          .filter((item) => item.transaction_id === trans.id) // Cocokkan berdasarkan transaction_id
+                          .map((item, index) => item.quantity)
+                          .reduce((acc, val) => acc + val, 0)}{" "}
+                        {/* Hitung total quantity */}
+                      </td>
+                      <td class="px-6 py-4">
+                        {detail
+                          .filter((item) => item.transaction_id === trans.id)
+                          .reduce((acc, item) => acc + item.sub_total, 0)}{" "}
+                        {/* Hitung total sub_total */}
+                      </td>
+
+                      <td class="px-6 py-4">{trans.total}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="text-center py-4">
+                      Tidak ada data yang tersedia
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
-
-            <nav
-              class="flex items-center flex-grow flex-wrap md:flex-row justify-between my-3"
-              aria-label="Table navigation"
-            >
-              <span class="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4 md:mb-0 block w-full md:inline md:w-auto">
-                Showing{" "}
-                <span class="font-semibold text-gray-900 dark:text-white">
-                  1-10
-                </span>{" "}
-                of{" "}
-                <span class="font-semibold text-gray-900 dark:text-white">
-                  1000
-                </span>
-              </span>
-              <ul class="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8">
-                <li>
-                  <a
-                    href="#"
-                    class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                  >
-                    Previous
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                  >
-                    1
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                  >
-                    2
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    aria-current="page"
-                    class="flex items-center justify-center px-3 h-8 text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
-                  >
-                    3
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                  >
-                    4
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                  >
-                    5
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                  >
-                    Next
-                  </a>
-                </li>
-              </ul>
-            </nav>
           </div>
         </div>
       </div>

@@ -92,7 +92,7 @@ const ProductTransaction = () => {
           <hr className="h-px bg-gray-300 border-0 dark:bg-gray-700"></hr>
           <div className="flex justify-between overflow-y-auto gap-10 my-7 py-5 px-10 bg-white border border-gray-200 rounded-sm shadow-sm h-[83%] min-h-[600px]">
             <div className="w-2/5">
-              <Card variant="h-[520px]">
+              <Card variant="h-[520px] mb-4">
                 {cart.map((item) => (
                   <div
                     key={item.id}
